@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'debug_toolbar',
 
     'accounts',
+    'posts',
+
     'rest_framework',
     'rest_framework_simplejwt',
 ]

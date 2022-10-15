@@ -26,9 +26,6 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-# ToDo Refactor common base class for User & Employer & RentComp & Mentors
-
-
 class MyBaseUser(AbstractUser):
     username = None
     email = models.EmailField(max_length=100, unique=True)
@@ -75,6 +72,8 @@ class Employer(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+
 
 
 
