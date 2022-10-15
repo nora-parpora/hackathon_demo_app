@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from accounts.models import Employer
 from posts.models import JobAdvert
 from posts.serializers import JobAdvertSerializer
+from posts.utils import CustomPagination
 
 
 class JobView(APIView):
@@ -57,6 +58,7 @@ class JobView(APIView):
 
 class JobSearchView(ListAPIView):
     serializer_class = JobAdvertSerializer
+    pagination_class = CustomPagination
 
     #metadata_class = JobAdvert
 
@@ -69,14 +71,25 @@ class JobSearchView(ListAPIView):
         qs = None
         if keyword:
             if qs:
-                qs &= Q(description__icontains=keyword)
+                qs &= Q(description__icontains=keyword.lower())
             else:
-                qs = Q(description__icontains=keyword)
+                qs = Q(description__icontains=keyword.lower())
         if sector:
             if qs:
-                qs &= Q(sector__name=sector)
+                qs &= Q(sector__name=sector.lower())
             else:
-                qs = Q(sector__name=sector)
+                qs = Q(sector__name=sector.lower())
+        if city:
+            if qs:
+                qs &= Q(city__icontains=city.lower())
+            else:
+                qs = Q(city__icontains=city.lower())
+        if empl_type:
+            if qs:
+                qs &= Q(empl_type__icontains=empl_type.lower())
+            else:
+                qs = Q(empl_type__icontains=empl_type.lower())
+
 
         if qs:
             return JobAdvert.objects.filter(qs)
