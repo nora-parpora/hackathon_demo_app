@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from accounts.models import Profile, MyBaseUser
+from accounts.models import Profile, MyBaseUser, Employer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -30,3 +30,24 @@ class ProfileSerializer(serializers.ModelSerializer):
         profile.save()
         return profile
 
+
+class EmployerSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Employer
+        fields = ['user', "name", "phone", "address"]
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        u = MyBaseUser.objects.create(**user_data)
+
+        employer = Employer.objects.create(name=validated_data['name'],
+                                        phone=validated_data['phone'],
+                                        address=validated_data['address'],
+                                        user=u,
+                                         )
+        u.set_password(user_data['password'])
+        u.save()
+        employer.save()
+        return employer

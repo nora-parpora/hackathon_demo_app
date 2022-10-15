@@ -39,7 +39,6 @@ class MyBaseUser(AbstractUser):
     REQUIRED_FIELDS = []
 
 
-
 class Profile(models.Model):
     FIRST_NAME_MAX_LENGTH = 50
     LAST_NAME_MAX_LENGTH = 50
