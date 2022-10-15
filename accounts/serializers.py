@@ -1,19 +1,32 @@
 from rest_framework import serializers
-from .models import UserData
+
+from accounts.models import Profile, MyBaseUser
 
 
 class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MyBaseUser
+        fields = ['email', 'password']
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
 
     class Meta:
-        model = UserData
-        fields = ["id", "email", "first_name", "last_name", "password", "phone" or None]
+        model = Profile
+        fields = ['user', "first_name", "last_name", "phone" or None]
 
     def create(self, validated_data):
-        user = UserData.objects.create(email=validated_data['email'],
-                                       first_name=validated_data['first_name'],
-                                       last_name=validated_data['last_name'],
-                                        phone=validated_data['phone'] or "None",
+        user_data = validated_data.pop('user')
+        u = MyBaseUser.objects.create(**user_data)
+
+        profile = Profile.objects.create(first_name=validated_data['first_name'],
+                                        last_name=validated_data['last_name'],
+                                        phone=validated_data['phone'] or "",
+                                        user=u,
                                          )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+        u.set_password(user_data['password'])
+        u.save()
+        profile.save()
+        return profile
+

@@ -26,47 +26,60 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class UserData(AbstractUser):
+# ToDo Refactor common base class for User & Employer & RentComp & Mentors
+
+
+class MyBaseUser(AbstractUser):
     username = None
     email = models.EmailField(max_length=100, unique=True)
-    first_name = models.CharField(max_length=100, blank=True, null=True)
-    last_name = models.CharField(max_length=100, blank=True, null=True)
-    phone = models.CharField(max_length=20, null=True, blank=True, unique=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+
+
+class Profile(models.Model):
+    FIRST_NAME_MAX_LENGTH = 50
+    LAST_NAME_MAX_LENGTH = 50
+    PHONE_NUMBER_MAX_LENGTH = 20
+    CITY_MAX_LENGTH = 30
+
+    user = models.OneToOneField(MyBaseUser, related_name="profile_data", primary_key=True, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=FIRST_NAME_MAX_LENGTH, blank=True, null=True)
+    last_name = models.CharField(max_length=LAST_NAME_MAX_LENGTH, blank=True, null=True)
+    phone = models.CharField(max_length=PHONE_NUMBER_MAX_LENGTH, null=True, blank=True)
 
     date_joined = models.DateTimeField(auto_now_add=True)
-    #is_admin = models.BooleanField(default=False)
-    #is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_superuser = models.BooleanField(default=False)
 
     @property
     def full_name(self):
         return f'{self.first_name or ""} {self.last_name or ""}'
 
+    def __str__(self):
+        return f'{self.full_name}'
+
+
+class Employer(models.Model):
+    NAME_MAX_LENGTH = 100
+    PHONE_NUMBER_MAX_LENGTH = 20
+    ADDRESS_MAX_LENGTH = 200
+    user = models.OneToOneField(MyBaseUser, related_name="employer_data", primary_key=True, on_delete=models.CASCADE)
+    name = models.CharField(max_length=NAME_MAX_LENGTH, blank=True, null=True)
+    phone = models.CharField(max_length=PHONE_NUMBER_MAX_LENGTH, null=True, blank=True)
+    address = models.TextField(max_length=ADDRESS_MAX_LENGTH, null=True, blank=True)
+
+    date_joined = models.DateTimeField(auto_now_add=True)
+
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['phone']
-
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.name}'
 
 
 
 
-
-#
-# class UserProfile(models.Model):
-#     user = models.OneToOneField(UserData, on_delete=models.CASCADE)
-#     phone = models.CharField(
-#         max_length=20,
-#         null=True,
-#         blank=True,
-#     )
-#     about_me = models.TextField(
-#         null=True,
-#         blank=True
-#     )
 
 
 

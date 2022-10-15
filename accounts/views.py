@@ -1,13 +1,17 @@
+from http.client import HTTPResponse
+
 from rest_framework.views import APIView
-from .serializers import UserSerializer
+from .serializers import ProfileSerializer
 from rest_framework.response import Response
 
 
 class RegisterView(APIView):
+
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        user = {'email': request.data['email'], 'password': request.data['password']}
+        serializer = ProfileSerializer(data={'user':user, 'first_name':request.data['first_name'], 'last_name':request.data['last_name'], 'phone':request.data['phone']})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        a={'first_name': serializer.data['first_name'], 'email': serializer.data['email']}
-        b = serializer.data
-        return Response(a)
+        return_value = serializer.data['first_name'], serializer.data['last_name']
+        # return Response(serializer.data)
+        return Response(return_value)
