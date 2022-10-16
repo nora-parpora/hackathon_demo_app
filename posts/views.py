@@ -1,8 +1,9 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,7 +13,7 @@ from posts.serializers import JobAdvertSerializer
 from posts.utils import CustomPagination
 
 
-class JobView(APIView):
+class JobsView(APIView):
     def post(self, request):
 
         user = request.user
@@ -29,7 +30,6 @@ class JobView(APIView):
 
         serializer.set_employer(user.id)
         serializer.save()
-
 
         return Response(serializer.data)
 
@@ -55,12 +55,9 @@ class JobView(APIView):
 # permission_classes = [permissions.IsAuthenticatedOrReadOnly,
 #                       IsOwnerOrReadOnly]
 
-
 class JobSearchView(ListAPIView):
     serializer_class = JobAdvertSerializer
     pagination_class = CustomPagination
-
-    #metadata_class = JobAdvert
 
     def get_queryset(self):
         keyword = self.request.GET.get('keyword')
@@ -89,10 +86,20 @@ class JobSearchView(ListAPIView):
                 qs &= Q(empl_type__icontains=empl_type.lower())
             else:
                 qs = Q(empl_type__icontains=empl_type.lower())
-
-
         if qs:
-            return JobAdvert.objects.filter(qs)
-        # ToDo to implement search for the city as well
-        return JobAdvert.objects.all()
+            return JobAdvert.objects.filter(qs).order_by("-pk")
+
+        return JobAdvert.objects.all().order_by("-pk")
+
+
+# class JobView(LoginRequiredMixin, RetrieveUpdateDestroyAPIView):
+#
+#     serializer_class = JobAdvertSerializer
+#
+#
+#     def get_object(self):
+#         try:
+#             return JobAdvert.objects.get(pk=self.kwargs['pk'])
+#         except JobAdvert.DoesNotExist:
+#             raise Http404
 

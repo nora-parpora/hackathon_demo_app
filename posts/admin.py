@@ -1,8 +1,9 @@
 from django.contrib import admin
 
-from accounts.models import Profile, Employer
+
+from posts.models import JobAdvert
 
 
-# @admin.register(Profile)
-# class ProfileAdmin(admin.ModelAdmin):
-#     list_display = ('full_name', 'user', 'date_joined')
+@admin.register(JobAdvert)
+class JobAdmin(admin.ModelAdmin):
+    list_display = ('position', 'employment_type')
