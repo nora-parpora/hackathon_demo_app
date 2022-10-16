@@ -8,17 +8,7 @@ class EmploymentType(Enum):
 
 
 class RentalType(Enum):
-    RENT = 'Rent'
-    FUNDED = 'Funded'
-
-
-
-    # @classmethod
-    # def from_string(cls, value) -> str:
-    #     if value not in [cls.FULL_TIME, cls.PART_TIME, cls.INTERN]:
-    #         return HttpResponse(status=400, content=(
-    #             f'None of the possible Employment types match the value {value}.'))
-    #
-    #     return value
+    RENT = "Rent"
+    FUNDED = "Funded"
 
 
