@@ -74,7 +74,25 @@ class Employer(models.Model):
         return f'{self.name}'
 
 
+class HouseOwner(models.Model):
+    FIRST_NAME_MAX_LENGTH = 50
+    LAST_NAME_MAX_LENGTH = 50
+    PHONE_NUMBER_MAX_LENGTH = 20
+    CITY_MAX_LENGTH = 30
 
+    user = models.OneToOneField(MyBaseUser, related_name="owner_data", primary_key=True, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=FIRST_NAME_MAX_LENGTH, blank=True, null=True)
+    last_name = models.CharField(max_length=LAST_NAME_MAX_LENGTH, blank=True, null=True)
+    phone = models.CharField(max_length=PHONE_NUMBER_MAX_LENGTH, null=True, blank=True)
+
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def full_name(self):
+        return f'{self.first_name or ""} {self.last_name or ""}'
+
+    def __str__(self):
+        return f'{self.full_name}'
 
 
 
