@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from posts.models import JobAdvert
+from posts.models import JobAdvert, RentAdvert
+
 
 class JobAdvertSerializer(serializers.ModelSerializer):
 
@@ -23,3 +24,26 @@ class JobAdvertSerializer(serializers.ModelSerializer):
 
         jobad.save()
         return jobad
+
+
+class RentAdvertSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = RentAdvert
+        fields = ["rental_type", "city", "rooms", "rent", "description"]
+
+    def set_owner(self, owner):
+        self.owner = owner
+
+    def create(self, validated_data):
+
+        rented = RentAdvert.objects.create(rental_type=validated_data['rental_type'],
+                                        city=validated_data['city'],
+                                        rooms=validated_data['rooms'],
+                                        rent=validated_data['rent'],
+                                        description=validated_data['description'],
+                                        owner=self.owner,
+                                         )
+
+        rented.save()
+        return rented

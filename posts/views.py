@@ -9,9 +9,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import Employer
+from accounts.models import Employer, HouseOwner
 from posts.models import JobAdvert
-from posts.serializers import JobAdvertSerializer
+from posts.serializers import JobAdvertSerializer, RentAdvertSerializer
 from posts.utils import CustomPagination
 
 
@@ -19,7 +19,6 @@ class JobsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
         user = request.user
         if not user or isinstance(user, AnonymousUser) :
             return HttpResponse(status=401)
@@ -80,3 +79,25 @@ class JobView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = JobAdvertSerializer
     queryset = JobAdvert.objects.all()
+
+
+class RentsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if not user or isinstance(user, AnonymousUser) :
+            return HttpResponse(status=401)
+
+        try:
+            o = HouseOwner.objects.get(pk=user.id)
+        except Exception as ex:
+            return HttpResponse(status=403, content=ex.args)
+
+        serializer = RentAdvertSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        serializer.set_owner(o)
+        serializer.save()
+
+        return Response(serializer.data)
